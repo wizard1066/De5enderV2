@@ -28,7 +28,7 @@ enum status {
     case rescued
 }
 
-enum spriteAttack {
+enum spriteAttack : CaseIterable {
     case cominNorth
     case cominSouth
     case cominEast
@@ -99,27 +99,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     var lastValue: CGFloat = 96
     var firstValue: CGFloat = 0
+    var stepValue: Int = 16
     
     // 128 here is a multiple of the screen width
     func buildGround(color: UIColor, lastOne: Int) -> (SKTexture, CGMutablePath) {
         print("lastOne \(lastOne)")
-        let loopsNeeded = Int(screenWidth / 16)
+        let loopsNeeded = Int(screenWidth / CGFloat(stepValue))
         var path: CGMutablePath?
+        // fuck
         let randomSource = GKARC4RandomSource()
         let randomDistribution = GKRandomDistribution(randomSource: randomSource, lowestValue: 80, highestValue: 256)
         for loop in stride(from: 0, to: Int(screenWidth*2), by: loopsNeeded) {
             var randomValueY = randomDistribution.nextInt()
-            if lastOne == numberOfForegrounds - 1, loop == Int(screenWidth*2) {
+// Last loop of last call, to rejoin the two halfs
+            if lastOne == numberOfForegrounds - 1, loop == (Int(screenWidth*2) - loopsNeeded) {
                 randomValueY = 96
+                print("lastOne \(loop) \(Int(screenWidth*2))")
             }
+            print("loop \(loop) \(Int(screenWidth*2)) \(loopsNeeded)")
             if path == nil {
                 path = CGMutablePath()
                 path!.move(to: CGPoint(x: firstValue, y: lastValue))
             } else {
                 path!.addLine(to: CGPoint(x: loop, y: randomValueY))
+                lastValue = CGFloat(randomValueY)
             }
-            lastValue = CGFloat(randomValueY)
-            
         }
         
         let shape = SKShapeNode()
@@ -285,7 +289,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         let shadow = BaiterEntity(imageName: "baiter", xCord: randX, yCord: randY, screenBounds: self.view!.bounds, view2D: foregrounds[0], scanNodes:scanNodes, foregrounds:foregrounds, shadowNode: nil, playerToKill: nil)
         let baiterShadow = shadow.spriteComponent.node
         shadow.baiterComponent.setScene(sceneNo: sceneNo)
-        switch sceneNo {
+        
+        // splits scene into 4 possibilities, however many scenes there are
+        let branch = sceneNo % 4
+        
+        switch branch {
         case 0:
             shadow.baiterComponent.setRunning(value2D: .cominNorth)
             break
@@ -305,7 +313,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         let baiter = BaiterEntity(imageName: "baiter", xCord: randX, yCord: randY, screenBounds: self.view!.bounds, view2D: foregrounds[0], scanNodes:scanNodes, foregrounds:foregrounds, shadowNode: baiterShadow, playerToKill: player)
         let baiterNode = baiter.spriteComponent.node
         baiter.baiterComponent.setScene(sceneNo: sceneNo)
-        switch sceneNo {
+        switch branch {
         case 0:
             baiter.baiterComponent.setRunning(value2D: .cominNorth)
             break
@@ -636,10 +644,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
 //        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominEast) // 2 bombers
 //        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominWest) // 2 bombers
 
-//        doBaiters(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
-//        doBaiters(sceneNo: 5,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
-        doMutants(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 mutants memory ok
-        doMutants(sceneNo: 5,player: player, bodies: 2 * waveCount)
+        doBaiters(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 4,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 5,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 6,player: player, bodies: 2 * waveCount)
+//        doMutants(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 mutants memory ok
+//        doMutants(sceneNo: 5,player: player, bodies: 2 * waveCount)
 
 //        for sceneNo in 0...7 {
 //            doLanders(sceneNo: sceneNo,player: player, bodies: 1)

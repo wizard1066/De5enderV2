@@ -37,7 +37,7 @@ class BaiterEntity: GKEntity {
 //            spriteNode.physicsBody = SKPhysicsBody.init(texture: texture, size: spriteNode.size)
             spriteNode.physicsBody = SKPhysicsBody.init(circleOfRadius: spriteNode.size.width/5 )
             spriteNode.physicsBody?.categoryBitMask = PhysicsCat.Alien
-            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.None
+            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.Alien
             spriteNode.physicsBody?.contactTestBitMask = PhysicsCat.Fire | PhysicsCat.Player
             spriteNode.physicsBody?.affectedByGravity = false
         }

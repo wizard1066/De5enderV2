@@ -30,7 +30,7 @@ class LanderEntity: GKEntity {
         if shadowNode != nil {
             spriteNode.physicsBody = SKPhysicsBody.init(texture: texture, size: spriteNode.size)
             spriteNode.physicsBody?.categoryBitMask = PhysicsCat.Alien
-            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.None
+            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.Alien
             spriteNode.physicsBody?.contactTestBitMask = PhysicsCat.SpaceMan | PhysicsCat.Fire | PhysicsCat.Player
             spriteNode.physicsBody?.affectedByGravity = false
         }
