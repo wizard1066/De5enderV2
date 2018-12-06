@@ -77,6 +77,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     
     var firing: AVAudioPlayer!
+    var explosion: AVAudioPlayer!
     var lastEscape: EntityNode!
     
     func spriteEscaped(sprite: EntityNode) {
@@ -94,6 +95,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             let url = URL(fileURLWithPath: path!)
             firing = try! AVAudioPlayer(contentsOf: url)
             firing.prepareToPlay
+            let path2 = Bundle.main.path(forResource: "bomb-3", ofType: ("mp3"))
+            let url2 = URL(fileURLWithPath: path2!)
+            explosion = try! AVAudioPlayer(contentsOf: url2)
+            explosion.prepareToPlay
         }
     }
     
@@ -568,7 +573,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             return
         }
         
-//        manager.startDeviceMotionUpdates()
+        manager.startDeviceMotionUpdates()
         
         preLoadSound()
         
@@ -627,10 +632,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         radar.position = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY * 2 - self.view!.bounds.maxY * 0.4)
     }
     
-    var waveCount = 1
+    var waveCount = 0
     
     func newWave() {
-        bodyCount = 7 + (8 * waveCount)
+        bodyCount = 8 + (12 * waveCount)
 //        bodyCount = (2 * waveCount)
         
         nextWave.textComponent.node.text = "Wave \(waveCount)"
@@ -641,19 +646,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         let playerScene = whereIsPlayer()
         let randomValueZ = (playerScene + 4) % numberOfForegrounds
         
-//        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominEast) // 2 bombers
-//        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominWest) // 2 bombers
+        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominEast) // 2 bombers
+        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominWest) // 2 bombers
 
-        doBaiters(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 4,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 5,player: player, bodies: 2 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 6,player: player, bodies: 2 * waveCount)
-//        doMutants(sceneNo: 3,player: player, bodies: 2 * waveCount) // 4 mutants memory ok
-//        doMutants(sceneNo: 5,player: player, bodies: 2 * waveCount)
+        doBaiters(sceneNo: 3,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 4,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 5,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
+        doBaiters(sceneNo: 6,player: player, bodies: 1 * waveCount)
+        
+        doMutants(sceneNo: 7,player: player, bodies: 2 * waveCount) // 4 mutants memory ok
+        doMutants(sceneNo: 2,player: player, bodies: 2 * waveCount)
 
-//        for sceneNo in 0...7 {
-//            doLanders(sceneNo: sceneNo,player: player, bodies: 1)
-//        }
+        for sceneNo in 0...7 {
+            doLanders(sceneNo: sceneNo,player: player, bodies: 1)
+        }
         
         
     }
@@ -988,6 +994,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     other.node?.removeFromParent()
                     highScore.textComponent.moreScore(score: 100)
                     doBodyCount()
+                    
                 }
             }
         }
@@ -1071,6 +1078,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let remover = SKAction.removeFromParent()
                     bonus.textComponent.node.run(SKAction.sequence([fadeIn, waiter, fadeOut, remover]))
                     doBodyCount()
+                    playerNode.run(SKAction.playSoundFileNamed("bomb-3.mp3", waitForCompletion: false))
                 }
             }
         }
