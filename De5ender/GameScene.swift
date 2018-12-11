@@ -56,13 +56,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     var player:PlayerEntity!
     var shadow:PlayerEntity!
-    var bodyCount:Int = 0 {
-        didSet {
-            
-                newLunch()
-            
-        }
-    }
+//    var bodyCount:Int = 0 {
+////        didSet {
+////                newLunch()
+////        }
+//    }
+    var bodyCount:Int = 0
     
     var playableStart: CGFloat = 0
     
@@ -123,10 +122,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     // 128 here is a multiple of the screen width
     func buildGround(color: UIColor, lastOne: Int) -> (SKTexture, CGMutablePath) {
-        print("lastOne \(lastOne)")
+        
         let loopsNeeded = Int(screenWidth / CGFloat(stepValue))
         var path: CGMutablePath?
-        // fuck
+   
         let randomSource = GKARC4RandomSource()
         let randomDistribution = GKRandomDistribution(randomSource: randomSource, lowestValue: 80, highestValue: 256)
         for loop in stride(from: 0, to: Int(screenWidth*2), by: loopsNeeded) {
@@ -134,9 +133,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
 // Last loop of last call, to rejoin the two halfs
             if lastOne == numberOfForegrounds - 1, loop == (Int(screenWidth*2) - loopsNeeded) {
                 randomValueY = 96
-                print("lastOne \(loop) \(Int(screenWidth*2))")
+                
             }
-            print("loop \(loop) \(Int(screenWidth*2)) \(loopsNeeded)")
+            
             if path == nil {
                 path = CGMutablePath()
                 path!.move(to: CGPoint(x: firstValue, y: lastValue))
@@ -263,13 +262,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var landers:[LanderEntity] = []
     
     func addItem(sceneNo: Int, randX: CGFloat) -> (EntityNode, EntityNode) {
-        let shadow = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + 96, shadowNode: nil)
+        let randY = CGFloat(GKRandomSource.sharedRandom().nextInt(upperBound: 96)) + 96
+        let shadow = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: nil)
         let itemShadow = shadow.itemComponent.node
         itemShadow.delegate = self
         itemShadow.name = "shadow"
         itemShadow.zPosition = Layer.spaceman.rawValue
         
-        let item = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + 96, shadowNode: itemShadow)
+        let item = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: itemShadow)
         let itemNode = item.itemComponent.node
         itemNode.zPosition = Layer.spaceman.rawValue
         itemNode.delegate = self
@@ -588,7 +588,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             return
         }
         
-//        manager.startDeviceMotionUpdates()
+        manager.startDeviceMotionUpdates()
         
         preLoadSound()
         buildExplosion()
@@ -630,10 +630,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     // Runs when I change the value held in bodyCount
     func newLunch() {
-//        nextWave.textComponent.node.run(SKAction.fadeOut(withDuration: 2))
         if bodyCount == 0 {
             let waitAction = SKAction.wait(forDuration: 4)
-//            let fadeAction = SKAction.fadeIn(withDuration: 2)
             let newAction = SKAction.run {
                 self.nextWave.textComponent.node.run(SKAction.fadeIn(withDuration: 4))
                 self.waveCount += 1
@@ -656,11 +654,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var waveCount = 0
     
     func newWave() {
-        if bodyCount > 0 {
-            return
-        }
         print("newWave \(waveCount) \(bodyCount)")
-        bodyCount = 8 + (12 * waveCount)
+//        bodyCount = 8 + (12 * waveCount)
+        bodyCount = 2
         
         var multiplyer: Int = 1
         if waveCount < 3 {
@@ -685,11 +681,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         doBaiters(sceneNo: 4,player: player, bodies: 1 * multiplyer) // 4 baiters memory ok
         doBaiters(sceneNo: 5,player: player, bodies: 1 * multiplyer) // 4 baiters memory ok
         doBaiters(sceneNo: 6,player: player, bodies: 1 * multiplyer)
-        
+
         doMutants(sceneNo: 7,player: player, bodies: 2 * multiplyer) // 4 mutants memory ok
         doMutants(sceneNo: 2,player: player, bodies: 2 * multiplyer)
 
-        for sceneNo in 0...7 {
+        for sceneNo in 0...multiplyer {
             doLanders(sceneNo: sceneNo,player: player, bodies: 1)
         }
         
@@ -709,8 +705,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         return indexToReturn
     }
     
+    var onceAsecond = 0
+    
     
     override func update(_ currentTime: CFTimeInterval) {
+        if onceAsecond == 480 {
+            nodesLeft()
+            onceAsecond = 0
+        } else {
+            onceAsecond += 1
+        }
         let direct = manager.deviceMotion?.attitude
         if direct != nil {
             if direct!.pitch > 0.1 {
@@ -816,22 +820,43 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var points: Int = 0
     
     func doBodyCount() {
-        print("bodyCount \(bodyCount)")
-        bodyCount -= 1
+        print("doBodyCount \(bodyCount)")
+//        bodyCount -= 1
         if bodyCount == 0 {
             nextWave.textComponent.node.alpha = 0
             if nextWave.textComponent.node.parent == nil {
                 addChild(nextWave.textComponent.node)
             }
             nextWave.textComponent.node.run(SKAction.fadeIn(withDuration: 2))
+            newLunch()
         }
     }
     
     var lastNodeA: SKNode!
     var lastNodeB: SKNode!
+    
+    func nodesLeft() {
+        print("nodesLeft \(bodyCount)")
 
+        var bodiesToBag = 0
+        for foreground in foregrounds {
+            let nodes = foreground.children
+            for node in nodes {
+                if node.name == "alien" {
+                    bodiesToBag += 1
+                    print("node \(node.position)")
+                }
+            }
+        }
+        bodyCount = bodiesToBag
+        
+        if bodyCount == 0 {
+            newLunch()
+        }
+    }
     
     func didBegin(_ contact: SKPhysicsContact) {
+
         // Stops multiple calls to didBegin same object, but brakes our spaceman drop
 //            if lastNodeA == contact.bodyA.node || lastNodeB == contact.bodyB.node {
 //                return
@@ -839,6 +864,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
 //                lastNodeA = contact.bodyA.node
 //                lastNodeB = contact.bodyB.node
 //            }
+        
+        print("didBegin bodyA \(contact.bodyA.node?.name) bodyB \(contact.bodyB.node?.name)")
         
         
         let other = contact.bodyA.categoryBitMask == PhysicsCat.Player ? contact.bodyB : contact.bodyA
@@ -848,21 +875,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         
         // alien kidnaps spaceman
 
-        if kidnap.node?.name == "spaceman" && kidnap.node?.parent?.name == "foreground" && contact.bodyA.node!.name == "alien" {
+//        if kidnap.node?.name == "spaceman" && kidnap.node?.parent?.name == "foreground" && contact.bodyB.node!.name == "alien" {
+        if kidnap.node?.name == "spaceman" && contact.bodyB.node!.name == "alien" {
             if let node = kidnap.node as? SKSpriteNode {
                 if node.parent != nil {
                     print("rule I")
-                    let shadow = kidnap.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
-                    (shadow as? SKSpriteNode)?.removeFromParent()
+                    if kidnap.node?.userData?.object(forKey: "status") as? status == nil {
+                        let shadow = kidnap.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
+                        (shadow as? SKSpriteNode)?.removeFromParent()
 
-                    kidnap.node?.removeFromParent()
-                    kidnap.node?.position = CGPoint(x: 0, y: -96)
-                    kidnap.node?.userData?.setObject(status.kidnapped, forKey: "status" as NSCopying)
-                    contact.bodyA.node?.addChild(kidnap.node!)
-                    let alienShadow = contact.bodyA.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
-                    alienShadow.position = CGPoint(x: 0, y: -64)
-                    alienShadow.addChild(shadow)
-                    highScore.textComponent.lessScore(score: 100)
+                        kidnap.node?.removeFromParent()
+                        kidnap.node?.position = CGPoint(x: 0, y: -96)
+                        kidnap.node?.userData?.setObject(status.kidnapped, forKey: "status" as NSCopying)
+                        contact.bodyB.node?.addChild(kidnap.node!)
+                        let alienShadow = contact.bodyB.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
+                        alienShadow.position = CGPoint(x: 0, y: -64)
+                        alienShadow.addChild(shadow)
+                        highScore.textComponent.lessScore(score: 100)
+                    }
                 }
             }
             return
@@ -939,10 +969,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             if let node = hit.node as? SKSpriteNode {
                 if node.parent != nil {
                     print("rule IV \(contact.bodyA.node?.name) \(contact.bodyB.node?.name)")
+                    
                     let victim = hit.node?.childNode(withName: "spaceman")
                     contact.bodyA.node?.removeFromParent()
+                    print("contact named \(contact.bodyA.node?.name)")
                     
-                    let parent2U = hit.node?.parent
+                    let parent2U = node.parent
                     if victim != nil {
                         victim?.position = (hit.node?.position)!
                         victim?.removeFromParent()
@@ -1134,8 +1166,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         if other.node?.name == "foreground" {
             if let node = other.node as? SKSpriteNode {
                 if node.parent != nil {
-                    print("rule V")
+                    print("rule V \(contact.bodyB.node?.name)")
                     contact.bodyB.node?.physicsBody?.isDynamic = false
+                    contact.bodyB.node?.userData?.setObject(status.rescued, forKey: "status" as NSCopying)
                     let poc = CGPoint(x: (contact.bodyB.node?.position.x)!, y: 96)
                     contact.bodyB.node?.run(SKAction.move(to: poc, duration: 0.5))
                     highScore.textComponent.moreScore(score: 250)
@@ -1146,7 +1179,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
 
         // shoot the spaceman and he will disppear
 
-        if hit.node?.name == "spaceman" && contact.bodyB.node?.name != "starship" {
+        if hit.node?.name == "spaceman" && contact.bodyB.node?.name == "missle" {
             if let node = hit.node as? SKSpriteNode {
                 if node.parent != nil {
                     print("rule VI")
@@ -1155,6 +1188,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                 }
             }
         }
+        
     }
     
     var previousDirection:String?
@@ -1217,9 +1251,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             print("bomber.position \(box.position)")
         case "starship":
             //fuck
-            self.enumerateChildNodes(withName: "mine") { (node, stop) in
-                print("node.name")
-            }
+            print("bodyCount \(bodyCount)")
         case "spaceman":
             print("player \(box.position)")
         case "baiter":

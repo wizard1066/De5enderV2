@@ -156,7 +156,7 @@ class LanderComponent: GKComponent {
         spriteComponent.node.position.y = spriteComponent.node.position.y + decentRate
         spriteShadow?.position.y = spriteComponent.node.position.y
         
-        if spriteComponent.node.position.y - spriteComponent.node.size.height / 2 < playableStart {
+        if spriteComponent.node.position.y - spriteComponent.node.size.height / 2 < playableStart + 96{
             changeDirection(seconds)
         }
         
