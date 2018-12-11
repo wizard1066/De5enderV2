@@ -28,11 +28,14 @@ class LanderEntity: GKEntity {
         spriteNode.size = CGSize(width: spriteNode.size.width/2, height: spriteNode.size.height/2)
         spriteNode.position = CGPoint(x: xCord, y: yCord)
         if shadowNode != nil {
-            spriteNode.physicsBody = SKPhysicsBody.init(texture: texture, size: spriteNode.size)
+//            spriteNode.physicsBody = SKPhysicsBody.init(texture: texture, size: spriteNode.size)
+            spriteNode.physicsBody = SKPhysicsBody.init(circleOfRadius: spriteNode.size.width/5 )
             spriteNode.physicsBody?.categoryBitMask = PhysicsCat.Alien
-            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.Alien
+            spriteNode.physicsBody?.collisionBitMask = PhysicsCat.None
             spriteNode.physicsBody?.contactTestBitMask = PhysicsCat.SpaceMan | PhysicsCat.Fire | PhysicsCat.Player
             spriteNode.physicsBody?.affectedByGravity = false
+            spriteNode.physicsBody?.angularDamping = 0
+            spriteNode.physicsBody?.restitution = 0.5
         }
         spriteNode.name = "alien"
         

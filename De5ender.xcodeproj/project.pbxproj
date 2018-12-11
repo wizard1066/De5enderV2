@@ -25,6 +25,7 @@
 		7B250A7C21B12F52005A4A7D /* TextEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B250A7B21B12F52005A4A7D /* TextEntity.swift */; };
 		7B250A7E21B13038005A4A7D /* TextComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B250A7D21B13038005A4A7D /* TextComponent.swift */; };
 		7B3E4CCC21B99BD500934F2C /* bomb-3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7B3E4CCB21B99BD500934F2C /* bomb-3.mp3 */; };
+		7B7FBCAB21BFB081005A7A8F /* ExplosionImages.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 7B7FBCAA21BFB081005A7A8F /* ExplosionImages.atlas */; };
 		7B81710621A55C6A002D9337 /* MineEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B81710521A55C6A002D9337 /* MineEntity.swift */; };
 		7BA5CCCF2192DB72007EB2E3 /* MoveAlongPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA5CCCE2192DB72007EB2E3 /* MoveAlongPath.swift */; };
 		7BA5CCD42192E9A4007EB2E3 /* PlayerEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA5CCD32192E9A4007EB2E3 /* PlayerEntity.swift */; };
@@ -69,6 +70,7 @@
 		7B250A7B21B12F52005A4A7D /* TextEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEntity.swift; sourceTree = "<group>"; };
 		7B250A7D21B13038005A4A7D /* TextComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextComponent.swift; sourceTree = "<group>"; };
 		7B3E4CCB21B99BD500934F2C /* bomb-3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "bomb-3.mp3"; path = "De5ender/Assets.xcassets/bomb-3.dataset/bomb-3.mp3"; sourceTree = SOURCE_ROOT; };
+		7B7FBCAA21BFB081005A7A8F /* ExplosionImages.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = ExplosionImages.atlas; sourceTree = "<group>"; };
 		7B81710521A55C6A002D9337 /* MineEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineEntity.swift; sourceTree = "<group>"; };
 		7BA5CCCE2192DB72007EB2E3 /* MoveAlongPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAlongPath.swift; sourceTree = "<group>"; };
 		7BA5CCD32192E9A4007EB2E3 /* PlayerEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerEntity.swift; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				7B250A7821B06426005A4A7D /* Sounds */,
+				7B7FBCAA21BFB081005A7A8F /* ExplosionImages.atlas */,
 				7BA5CCDA21931B1A007EB2E3 /* Resources */,
 				7BA5CCD22192E96A007EB2E3 /* Components */,
 				7BA5CCD02192E953007EB2E3 /* Entity */,
@@ -269,6 +272,7 @@
 				7BE20D19219222BA00D68240 /* LaunchScreen.storyboard in Resources */,
 				7B3E4CCC21B99BD500934F2C /* bomb-3.mp3 in Resources */,
 				7BE20D252192252200D68240 /* SwiftLogo.png in Resources */,
+				7B7FBCAB21BFB081005A7A8F /* ExplosionImages.atlas in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

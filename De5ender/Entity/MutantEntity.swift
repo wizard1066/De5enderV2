@@ -40,7 +40,8 @@ class MutantEntity: GKEntity {
             spriteNode.physicsBody?.contactTestBitMask = PhysicsCat.Fire | PhysicsCat.Player
             spriteNode.physicsBody?.affectedByGravity = false
             spriteNode.physicsBody?.restitution = 0.5
-            spriteNode.physicsBody?.linearDamping = 0.0
+            spriteNode.physicsBody?.linearDamping = 0
+            spriteNode.physicsBody?.angularDamping = 0
             spriteNode.physicsBody?.mass = 4.0
         }
         spriteNode.name = "mutant"

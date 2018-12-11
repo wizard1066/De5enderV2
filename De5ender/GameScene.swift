@@ -58,7 +58,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var shadow:PlayerEntity!
     var bodyCount:Int = 0 {
         didSet {
-            newLunch()
+            
+                newLunch()
+            
         }
     }
     
@@ -79,6 +81,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var firing: AVAudioPlayer!
     var explosion: AVAudioPlayer!
     var lastEscape: EntityNode!
+    private var expoFrames: [SKTexture] = []
+    
+    func buildExplosion() {
+        let expoAnimatedAtlas = SKTextureAtlas(named: "ExplosionImages.atlas")
+        var doExpo: [SKTexture] = []
+        
+        let numImages = expoAnimatedAtlas.textureNames.count - 1
+        for i in 0..<numImages {
+            let expoTextureName = "Explo__00\(i).png"
+            doExpo.append(expoAnimatedAtlas.textureNamed(expoTextureName))
+        }
+        expoFrames = doExpo
+    }
     
     func spriteEscaped(sprite: EntityNode) {
         if lastEscape == sprite {
@@ -162,7 +177,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             let scanNode = scanground.buildComponent.node
             scanNode.delegate = self
             foregroundNode.delegate = self
-//            staticStars(source: foregroundNode)
+            staticStars(source: foregroundNode)
             addChild(foreground.buildComponent.node)
             foregrounds.append(foregroundNode)
             scanNodes.append(scanNode)
@@ -544,14 +559,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var manager: CMMotionManager!
     
     func staticStars(source: SKSpriteNode) {
-        let lowest = Int(self.view!.bounds.maxY * 0.2)
+        let lowest = Int(self.view!.bounds.maxY * 0.4)
         for k in lowest ... Int(self.view!.bounds.maxY * 2 * 0.8) {
             let place = GKRandomSource.sharedRandom().nextBool()
             if place {
                 let randX = GKRandomSource.sharedRandom().nextInt(upperBound: Int(self.view!.bounds.maxX) * 2)
                 let star = SKLabelNode(fontNamed: "Helvetica")
-                let randP = GKRandomSource.sharedRandom().nextInt(upperBound: 18) - 8
-                if randP > 6 {
+                let randP = GKRandomSource.sharedRandom().nextInt(upperBound: 36)
+                if randP < 8 {
                     star.fontSize = CGFloat(randP)
                     star.text = "✦"
                     star.position = CGPoint(x: randX, y: k)
@@ -573,9 +588,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             return
         }
         
-        manager.startDeviceMotionUpdates()
+//        manager.startDeviceMotionUpdates()
         
         preLoadSound()
+        buildExplosion()
         
         cameraNode = SKCameraNode()
         cameraNode.position = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY)
@@ -591,9 +607,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         addHUD()
         
 //        Add a boundry to the screen
-        let rectToSecure = CGRect(x: 0, y: 0, width: self.view!.bounds.maxX * 2, height: self.view!.bounds.minY * 2 )
-        physicsBody = SKPhysicsBody(edgeLoopFrom: rectToSecure)
-        physicsBody?.isDynamic = false
+//        let rectToSecure = CGRect(x: 0, y: 0, width: self.view!.bounds.maxX * 2, height: self.view!.bounds.minY * 2 )
+//        physicsBody = SKPhysicsBody(edgeLoopFrom: rectToSecure)
+//        physicsBody?.isDynamic = false
+//        physicsBody?.collisionBitMask = PhysicsCat.None
+//        physicsBody?.contactTestBitMask = PhysicsCat.None
+//        physicsBody?.categoryBitMask = PhysicsCat.None
+        
+        
 
         let highscorePlacement = CGPoint(x: self.view!.bounds.maxX * 2 - 128, y: self.view!.bounds.maxY * 2 - 128)
         highScore = TextEntity(text: "0", Cords:highscorePlacement , name: "highscore")
@@ -617,7 +638,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                 self.nextWave.textComponent.node.run(SKAction.fadeIn(withDuration: 4))
                 self.waveCount += 1
                 self.newWave()
-                print("\(self.waveCount)")
+                print("newLunch \(self.waveCount)")
             }
             nextWave.textComponent.node.run(SKAction.sequence([newAction]))
         }
@@ -635,7 +656,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var waveCount = 0
     
     func newWave() {
+        if bodyCount > 0 {
+            return
+        }
+        print("newWave \(waveCount) \(bodyCount)")
         bodyCount = 8 + (12 * waveCount)
+        
+        var multiplyer: Int = 1
+        if waveCount < 3 {
+            multiplyer = waveCount
+        } else {
+            multiplyer = 3
+        }
 //        bodyCount = (2 * waveCount)
         
         nextWave.textComponent.node.text = "Wave \(waveCount)"
@@ -646,16 +678,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         let playerScene = whereIsPlayer()
         let randomValueZ = (playerScene + 4) % numberOfForegrounds
         
-        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominEast) // 2 bombers
-        doBombers(sceneNo: randomValueZ,bodies: 2 * waveCount, wayToGo: .cominWest) // 2 bombers
+        doBombers(sceneNo: randomValueZ,bodies: 2 * multiplyer, wayToGo: .cominEast) // 2 bombers
+        doBombers(sceneNo: randomValueZ,bodies: 2 * multiplyer, wayToGo: .cominWest) // 2 bombers
 
-        doBaiters(sceneNo: 3,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 4,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 5,player: player, bodies: 1 * waveCount) // 4 baiters memory ok
-        doBaiters(sceneNo: 6,player: player, bodies: 1 * waveCount)
+        doBaiters(sceneNo: 3,player: player, bodies: 1 * multiplyer) // 4 baiters memory ok
+        doBaiters(sceneNo: 4,player: player, bodies: 1 * multiplyer) // 4 baiters memory ok
+        doBaiters(sceneNo: 5,player: player, bodies: 1 * multiplyer) // 4 baiters memory ok
+        doBaiters(sceneNo: 6,player: player, bodies: 1 * multiplyer)
         
-        doMutants(sceneNo: 7,player: player, bodies: 2 * waveCount) // 4 mutants memory ok
-        doMutants(sceneNo: 2,player: player, bodies: 2 * waveCount)
+        doMutants(sceneNo: 7,player: player, bodies: 2 * multiplyer) // 4 mutants memory ok
+        doMutants(sceneNo: 2,player: player, bodies: 2 * multiplyer)
 
         for sceneNo in 0...7 {
             doLanders(sceneNo: sceneNo,player: player, bodies: 1)
@@ -908,13 +940,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                 if node.parent != nil {
                     print("rule IV \(contact.bodyA.node?.name) \(contact.bodyB.node?.name)")
                     let victim = hit.node?.childNode(withName: "spaceman")
-                    
-                    //            let alienShadow = hit.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
-                    //            alienShadow.removeFromParent()
                     contact.bodyA.node?.removeFromParent()
                     
                     let parent2U = hit.node?.parent
-                    //            hit.node?.removeFromParent()
                     if victim != nil {
                         victim?.position = (hit.node?.position)!
                         victim?.removeFromParent()
@@ -928,7 +956,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                             let positionToScore = CGPoint(x: (hit.node?.position.x)! + fX!, y: (hit.node?.position.y)!)
                             let shadow = hit.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
                             (shadow as? SKSpriteNode)?.removeFromParent()
-                            hit.node?.removeFromParent()
+//                            hit.node?.run(SKAction.fadeOut(withDuration: 0))
+                            playerNode.run(SKAction.playSoundFileNamed("bomb-3.mp3", waitForCompletion: false))
+                            
+                            let expoAction = SKAction.animate(with: expoFrames, timePerFrame: 0.1, resize: false, restore: true)
+                            let removeAction = SKAction.removeFromParent()
+                            hit.node?.run(SKAction.sequence([expoAction, removeAction]))
+                            
                             highScore.textComponent.moreScore(score: 100)
                             let bonus = TextEntity(text: "100", Cords: positionToScore, name: "bonus")
                             bonus.textComponent.node.zPosition = Layer.mask.rawValue
@@ -957,7 +991,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                         let fadeOut = SKAction.fadeOut(withDuration: 2)
                         let fadeIn = SKAction.fadeIn(withDuration: 2)
                         let waiter = SKAction.wait(forDuration: 2)
-                        contact.bodyA.node?.run(SKAction.sequence([fadeOut, waiter, fadeIn]))
+                        contact.bodyA.node?.run(SKAction.playSoundFileNamed("bomb-3.mp3", waitForCompletion: false))
+                        
+                        let expoAction = SKAction.animate(with: expoFrames, timePerFrame: 0.1, resize: false, restore: true)
+                        let removeAction = SKAction.removeFromParent()
+                        contact.bodyA.node?.run(SKAction.sequence([expoAction, waiter]))
+                        
+                        
+//                        contact.bodyA.node?.run(SKAction.sequence([fadeOut, waiter, fadeIn]))
                         
                         self.removeLives()
                         
@@ -999,7 +1040,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             }
         }
         
-        // player hots mutant
+        // player hits mutant
         
         if other.node?.name == "mutant" && contact.bodyA.node?.name == "starship" {
             
@@ -1067,7 +1108,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     deleteEntry(entry2D: node)
                     let shadow = node.userData?.object(forKey:"shadow") as! SKSpriteNode
                     (shadow as? SKSpriteNode)?.removeFromParent()
-                    node.removeFromParent()
+//                    node.removeFromParent()
+                    let expoAction = SKAction.animate(with: expoFrames, timePerFrame: 0.1, resize: false, restore: true)
+                    let removeAction = SKAction.removeFromParent()
+                    node.run(SKAction.sequence([expoAction, removeAction]))
                     highScore.textComponent.moreScore(score: 100)
                     let bonus = TextEntity(text: "100", Cords: positionToScore, name: "bonus")
                     bonus.textComponent.node.zPosition = Layer.mask.rawValue
@@ -1079,6 +1123,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     bonus.textComponent.node.run(SKAction.sequence([fadeIn, waiter, fadeOut, remover]))
                     doBodyCount()
                     playerNode.run(SKAction.playSoundFileNamed("bomb-3.mp3", waitForCompletion: false))
+                    
                 }
             }
         }

@@ -40,6 +40,8 @@ class BaiterEntity: GKEntity {
             spriteNode.physicsBody?.collisionBitMask = PhysicsCat.Alien
             spriteNode.physicsBody?.contactTestBitMask = PhysicsCat.Fire | PhysicsCat.Player
             spriteNode.physicsBody?.affectedByGravity = false
+            spriteNode.physicsBody?.angularDamping = 0
+            spriteNode.physicsBody?.restitution = 0.5
         }
         spriteNode.name = "baiter"
         
