@@ -39,7 +39,11 @@ class PlayerEntity: GKEntity {
                 spriteNode.userData?.setObject(self, forKey: "class" as NSCopying)
                 //            spriteNode.userData?.setObject(bomb, forKey: "bomb" as NSCopying)
             }
+            if !physics {
+                spriteNode.isUserInteractionEnabled = false
+            }
         }
+        
      }
     
     required init?(coder aDecoder: NSCoder) {

@@ -488,6 +488,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             let playerAvailableNode = playerAvailable.spriteComponent.node
             playerAvailableNode.position = CGPoint(x: self.view!.bounds.minX + CGFloat(64), y: (self.view!.bounds.maxY * 2) - CGFloat((lifes * 64) + 64))
             playerAvailableNode.scale(to: CGSize(width: playerAvailableNode.size.width/2.5, height: playerAvailableNode.size.height/2.5))
+            playerAvailableNode.name = "lives"
+            playerAvailableNode.delegate = self
             addChild(playerAvailableNode)
             playerLives.append(playerAvailableNode)
         }
@@ -507,6 +509,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         shadowNode.position = CGPoint(x: self.view!.bounds.maxX / 2, y: self.view!.bounds.maxY / 2)
         shadowNode.scale(to: CGSize(width: shadowNode.size.width/4, height: shadowNode.size.height/4))
         shadowNode.position.x = shadowNode.position.x / 4
+        shadowNode.delegate = self
         radar.addChild(shadowNode)
         
         player = PlayerEntity(imageName: "ship16", shadowNode: shadowNode, physics: true)

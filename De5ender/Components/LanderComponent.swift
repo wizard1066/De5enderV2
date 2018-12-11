@@ -87,6 +87,7 @@ class LanderComponent: GKComponent {
             return
         }
         let mine = BaitEntity(imageName: "mine", owningNode: self.spriteComponent.node)
+        
         let path = CGMutablePath()
         mine.spriteComponent.node.position = CGPoint.zero
         mine.spriteComponent.node.name = "mine"

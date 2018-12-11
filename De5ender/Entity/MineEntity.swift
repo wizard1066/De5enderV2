@@ -9,7 +9,11 @@
 import SpriteKit
 import GameplayKit
 
-class MineEntity: GKEntity {
+class MineEntity: GKEntity, touchMe {
+    func spriteTouched(box: TouchableSprite) {
+        // do nothing
+    }
+    
     var spriteComponent: SpriteComponent!
     var mineComponent: MineComponent!
     
@@ -24,6 +28,7 @@ class MineEntity: GKEntity {
         addComponent(mineComponent)
         
         let mineNode = spriteComponent.node
+        mineNode.delegate = self
         mineNode.size = CGSize(width: 32, height: 32)
 //        mineNode.position.x = owningNode.position.x
 //        mineNode.position.y = owningNode.position.y + 128
