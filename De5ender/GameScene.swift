@@ -484,6 +484,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var shadowNode: EntityNode!
     var advancedArrow: HeadsUpEntity!
     var highScore: TextEntity!
+    var currentScore: TextEntity!
     var nextWave: TextEntity!
     var playerLives:[EntityNode] = []
     
@@ -625,11 +626,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         
         
 
-        let highscorePlacement = CGPoint(x: self.view!.bounds.maxX * 2 - 128, y: self.view!.bounds.maxY * 2 - 128)
-        highScore = TextEntity(text: "0", Cords:highscorePlacement , name: "highscore")
+        let highScorePlacement = CGPoint(x: self.view!.bounds.maxX * 2 - 128, y: self.view!.bounds.maxY * 2 - 128)
+        highScore = TextEntity(text: "0", Cords:highScorePlacement , name: "highscore")
         highScore.textComponent.node.zPosition = Layer.mask.rawValue
+        highScore.textComponent.showHighScore()
         addChild(highScore.textComponent.node)
         
+        let currentScorePlacement = CGPoint(x: self.view!.bounds.maxX * 2 - 128, y: self.view!.bounds.maxY * 2 - 192)
+        currentScore = TextEntity(text: "0", Cords:currentScorePlacement , name: "currentscore")
+        currentScore.textComponent.node.zPosition = Layer.mask.rawValue
+        addChild(currentScore.textComponent.node)
         
         let nextWavePlacement = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY)
         nextWave = TextEntity(text: "", Cords: nextWavePlacement, name: "nextwave")
@@ -905,7 +911,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                         
                         radarNode.addChild(shadow)
                         
-                        highScore.textComponent.lessScore(score: 100)
+                        currentScore.textComponent.lessScore(score: 100)
                     }
                 }
             }
@@ -928,7 +934,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                         other.node?.physicsBody?.isDynamic = false
                         //            other.node?.userData?.setObject(status.rescued, forKey: "status" as NSCopying)
                         contact.bodyB.node?.addChild(other.node!)
-                        highScore.textComponent.moreScore(score: 500)
+                        currentScore.textComponent.moreScore(score: 500)
                         
                         let bonus = TextEntity(text: "500", Cords: positionToScore, name: "bonus")
                         bonus.textComponent.node.zPosition = Layer.mask.rawValue
@@ -970,7 +976,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                         let waiter = SKAction.wait(forDuration: 0.5)
                         let remover = SKAction.removeFromParent()
                         bonus.textComponent.node.run(SKAction.sequence([fadeIn, waiter, fadeOut, remover]))
-                        highScore.textComponent.moreScore(score: 250)
+                        currentScore.textComponent.moreScore(score: 250)
                     }
                 }
             }
@@ -1009,7 +1015,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                             let removeAction = SKAction.removeFromParent()
                             hit.node?.run(SKAction.sequence([expoAction, removeAction]))
                             
-                            highScore.textComponent.moreScore(score: 100)
+                            currentScore.textComponent.moreScore(score: 100)
                             let bonus = TextEntity(text: "100", Cords: positionToScore, name: "bonus")
                             bonus.textComponent.node.zPosition = Layer.mask.rawValue
                             addChild(bonus.textComponent.node)
@@ -1034,13 +1040,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     print("rule XI")
                     
                     if lives != 0 {
-                        let fadeOut = SKAction.fadeOut(withDuration: 2)
-                        let fadeIn = SKAction.fadeIn(withDuration: 2)
+                        
+//                        let fadeOut = SKAction.fadeOut(withDuration: 2)
+//                        let fadeIn = SKAction.fadeIn(withDuration: 2)
                         let waiter = SKAction.wait(forDuration: 2)
                         contact.bodyA.node?.run(SKAction.playSoundFileNamed("bomb-3.mp3", waitForCompletion: false))
                         
                         let expoAction = SKAction.animate(with: expoFrames, timePerFrame: 0.1, resize: false, restore: true)
-                        let removeAction = SKAction.removeFromParent()
+//                        let removeAction = SKAction.removeFromParent()
                         contact.bodyA.node?.run(SKAction.sequence([expoAction, waiter]))
                         
                         
@@ -1051,7 +1058,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                         lives -= 1
                     } else {
                         lives = 3
-                        print("GameOver \(points)")
+                        print("GameOver \(currentScore.textComponent.currentScore) \(highScore.textComponent.highScore)")
+                        
+                        if currentScore.textComponent.currentScore > highScore.textComponent.highScore {
+                            highScore.textComponent.highScore = currentScore.textComponent.currentScore
+                            highScore.textComponent.showHighScore()
+                        }
                         
                         contact.bodyA.node?.removeFromParent()
                         other.node?.removeFromParent()
@@ -1093,7 +1105,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let shadow = other.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
                     (shadow as? SKSpriteNode)?.removeFromParent()
                     other.node?.removeFromParent()
-                    highScore.textComponent.moreScore(score: 100)
+                    currentScore.textComponent.moreScore(score: 100)
                     doBodyCount()
                     
                 }
@@ -1110,7 +1122,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let shadow = other.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
                     (shadow as? SKSpriteNode)?.removeFromParent()
                     other.node?.removeFromParent()
-                    highScore.textComponent.moreScore(score: 100)
+                    currentScore.textComponent.moreScore(score: 100)
                     doBodyCount()
                 }
             }
@@ -1126,7 +1138,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let shadow = other.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
                     (shadow as? SKSpriteNode)?.removeFromParent()
                     other.node?.removeFromParent()
-                    highScore.textComponent.moreScore(score: 100)
+                    currentScore.textComponent.moreScore(score: 100)
                     doBodyCount()
                 }
             }
@@ -1142,7 +1154,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let shadow = other.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
                     (shadow as? SKSpriteNode)?.removeFromParent()
                     other.node?.removeFromParent()
-                    highScore.textComponent.moreScore(score: 100)
+                    currentScore.textComponent.moreScore(score: 100)
                     doBodyCount()
                 }
             }
@@ -1172,7 +1184,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     let expoAction = SKAction.animate(with: expoFrames, timePerFrame: 0.1, resize: false, restore: true)
                     let removeAction = SKAction.removeFromParent()
                     node.run(SKAction.sequence([expoAction, removeAction]))
-                    highScore.textComponent.moreScore(score: 100)
+                    currentScore.textComponent.moreScore(score: 100)
                     let bonus = TextEntity(text: "100", Cords: positionToScore, name: "bonus")
                     bonus.textComponent.node.zPosition = Layer.mask.rawValue
                     addChild(bonus.textComponent.node)
@@ -1199,7 +1211,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     contact.bodyB.node?.userData?.setObject(status.rescued, forKey: "status" as NSCopying)
                     let poc = CGPoint(x: (contact.bodyB.node?.position.x)!, y: 96)
                     contact.bodyB.node?.run(SKAction.move(to: poc, duration: 0.5))
-                    highScore.textComponent.moreScore(score: 250)
+                    currentScore.textComponent.moreScore(score: 250)
                 }
             }
             return
@@ -1212,7 +1224,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                 if node.parent != nil {
                     print("rule VI")
                     hit.node?.removeFromParent()
-                    highScore.textComponent.lessScore(score: 100)
+                    currentScore.textComponent.lessScore(score: 100)
                 }
             }
         }

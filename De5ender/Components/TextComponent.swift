@@ -11,10 +11,14 @@ import GameplayKit
 
 class TextComponent: GKComponent {
     let node: SKLabelNode
+    var highScore: Int = 0
+    var currentScore: Int = 0
     
     init(entity: GKEntity, text2D: String) {
         node = SKLabelNode(text: text2D)
         node.entity = entity
+        let defaults = UserDefaults.standard
+        highScore = defaults.integer(forKey: "highScore")
         super.init()
     }
     
@@ -26,16 +30,24 @@ class TextComponent: GKComponent {
         return node.position
     }
     
+    func showHighScore() {
+        node.text = "HScore \(highScore)"
+        let defaults = UserDefaults.standard
+        defaults.set(highScore, forKey: "highScore")
+    }
+    
     func moreScore(score: Int) {
-        let oldScore = Int(node.text!)
-        let newScore = oldScore! + score
-        node.text = "\(newScore)"
+//        let oldScore = Int(node.text!)
+//        let newScore = oldScore! + score
+        currentScore += score
+        node.text = "CScore \(currentScore)"
     }
     
     func lessScore(score: Int) {
-        let oldScore = Int(node.text!)
-        let newScore = oldScore! - score
-        node.text = "\(newScore)"
+//        let oldScore = Int(node.text!)
+//        let newScore = oldScore! - score
+        currentScore -= score
+        node.text = "CScore \(currentScore)"
     }
     
     
