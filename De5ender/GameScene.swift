@@ -263,13 +263,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     
     func addItem(sceneNo: Int, randX: CGFloat) -> (EntityNode, EntityNode) {
         let randY = CGFloat(GKRandomSource.sharedRandom().nextInt(upperBound: 96)) + 96
-        let shadow = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: nil)
+        let shadow = ItemEntity(imageName: "battery", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: nil)
         let itemShadow = shadow.itemComponent.node
         itemShadow.delegate = self
         itemShadow.name = "shadow"
         itemShadow.zPosition = Layer.spaceman.rawValue
         
-        let item = ItemEntity(imageName: "ItemBlank", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: itemShadow)
+        let item = ItemEntity(imageName: "battery", xCord: randX, yCord: self.view!.bounds.minY + randY, shadowNode: itemShadow)
         let itemNode = item.itemComponent.node
         itemNode.zPosition = Layer.spaceman.rawValue
         itemNode.delegate = self
@@ -885,15 +885,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     print("rule I")
                     if kidnap.node?.userData?.object(forKey: "status") as? status == nil {
                         let shadow = kidnap.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
+                        shadow.position = CGPoint(x: 0, y: -96)
                         (shadow as? SKSpriteNode)?.removeFromParent()
+                        
+                        let radarNode = contact.bodyB.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
 
                         kidnap.node?.removeFromParent()
                         kidnap.node?.position = CGPoint(x: 0, y: -96)
                         kidnap.node?.userData?.setObject(status.kidnapped, forKey: "status" as NSCopying)
                         contact.bodyB.node?.addChild(kidnap.node!)
-                        let alienShadow = contact.bodyB.node?.userData?.object(forKey:"shadow") as! SKSpriteNode
-                        alienShadow.position = CGPoint(x: 0, y: -64)
-                        alienShadow.addChild(shadow)
+                        
+                        radarNode.addChild(shadow)
+                        
                         highScore.textComponent.lessScore(score: 100)
                     }
                 }

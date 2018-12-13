@@ -22,7 +22,7 @@ class ItemEntity: GKEntity {
         let spriteNode = itemComponent.node
         spriteNode.name = "spaceman"
         spriteNode.position = CGPoint(x: xCord, y: yCord)
-        spriteNode.size = CGSize(width: spriteNode.size.width/2, height: spriteNode.size.height/2)
+        spriteNode.size = CGSize(width: spriteNode.size.width/4, height: spriteNode.size.height/4)
         spriteNode.physicsBody = SKPhysicsBody.init(texture: texture, size: spriteNode.size)
         spriteNode.physicsBody?.categoryBitMask = PhysicsCat.SpaceMan
         spriteNode.physicsBody?.collisionBitMask = PhysicsCat.None
