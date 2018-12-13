@@ -14,7 +14,7 @@ class BuildComponent: GKComponent {
     
     init(entity: GKEntity, texture: SKTexture, size: CGSize) {
         node = EntityNode(texture: texture, color: SKColor.white, size: size)
-        node.entity = entity
+
         super.init()
     }
     

@@ -34,6 +34,7 @@ class BuildEntity: GKEntity {
         spriteNode.position = CGPoint(x: width * CGFloat(i), y: playableStart)
         spriteNode.name = "foreground"
         
+        
         if physics {
             spriteNode.physicsBody = SKPhysicsBody(edgeChainFrom: path)
             spriteNode.physicsBody?.categoryBitMask = PhysicsCat.Ground

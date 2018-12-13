@@ -11,6 +11,7 @@ import GameplayKit
 import CoreMotion
 import AVFoundation
 
+
 struct PhysicsCat {
     static let None: UInt32 = 0
     static let Player: UInt32 = 0b1
@@ -81,6 +82,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
     var explosion: AVAudioPlayer!
     var lastEscape: EntityNode!
     private var expoFrames: [SKTexture] = []
+    
+    
     
     func buildExplosion() {
         let expoAnimatedAtlas = SKTextureAtlas(named: "ExplosionImages.atlas")
@@ -174,6 +177,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             let scanground = BuildEntity(texture: texture, path: path, i: i, width: self.view!.bounds.width * 2, physics: false)
             let foregroundNode = foreground.buildComponent.node
             let scanNode = scanground.buildComponent.node
+//            scanNode.color = SKColor.black
+//            scanNode.colorBlendFactor = 0.2
             scanNode.delegate = self
             foregroundNode.delegate = self
             staticStars(source: foregroundNode)
@@ -193,17 +198,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             radar.addChild(scanNode)
         }
         
-//        let block = SKShapeNode(rect: CGRect(x: self.view!.bounds.minX, y: self.view!.bounds.maxY * 2 - self.view!.bounds.maxY * 0.4, width: self.view!.bounds.maxX/2, height:self.view!.bounds.maxY * 0.4 / 2))
-//        block.fillColor = (scene?.backgroundColor)!
-//        block.lineWidth = 0
-//        block.zPosition = Layer.mask.rawValue
-//        addChild(block)
-//
-//        let block2 = SKShapeNode(rect: CGRect(x: self.view!.bounds.minX + self.view!.bounds.maxX/2 * 3, y: self.view!.bounds.maxY * 2 - self.view!.bounds.maxY * 0.4, width: self.view!.bounds.maxX/2, height:self.view!.bounds.maxY * 0.4 / 2))
-//        block2.fillColor = (scene?.backgroundColor)!
-//        block2.lineWidth = 0
-//        block2.zPosition = Layer.mask.rawValue
-//        addChild(block2)
+        let block = SKShapeNode(rect: CGRect(x: self.view!.bounds.minX, y: self.view!.bounds.maxY * 2 - self.view!.bounds.maxY * 0.4, width: self.view!.bounds.maxX/2, height:self.view!.bounds.maxY * 0.4))
+        block.fillColor = (scene?.backgroundColor)!
+        block.lineWidth = 0
+        block.zPosition = Layer.mask.rawValue
+        addChild(block)
+
+        let block2 = SKShapeNode(rect: CGRect(x: self.view!.bounds.minX + self.view!.bounds.maxX/2 * 3, y: self.view!.bounds.maxY * 2 - self.view!.bounds.maxY * 0.4, width: self.view!.bounds.maxX/2, height:self.view!.bounds.maxY * 0.4))
+        block2.fillColor = (scene?.backgroundColor)!
+        block2.lineWidth = 0
+        block2.zPosition = Layer.mask.rawValue
+        addChild(block2)
         
     }
     
@@ -490,6 +495,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             playerAvailableNode.scale(to: CGSize(width: playerAvailableNode.size.width/2.5, height: playerAvailableNode.size.height/2.5))
             playerAvailableNode.name = "lives"
             playerAvailableNode.delegate = self
+            playerAvailableNode.zPosition = Layer.mask.rawValue
             addChild(playerAvailableNode)
             playerLives.append(playerAvailableNode)
         }
@@ -1044,6 +1050,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     } else {
                         lives = 3
                         print("GameOver \(points)")
+                        self.view?.isPaused = true
                         contact.bodyA.node?.removeFromParent()
                         other.node?.removeFromParent()
                         
@@ -1256,8 +1263,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         case "bomber":
             print("bomber.position \(box.position)")
         case "starship":
-            //fuck
-            print("bodyCount \(bodyCount)")
+            // wip
+            self.view?.isPaused = true
+            // only works if I have a single view controller!!
+//            let myAlert: UIAlertController = UIAlertController(title: "Alert!", message: "Oh! Fancy", preferredStyle: .alert)
+//            myAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//            self.view?.window?.rootViewController?.present(myAlert, animated: true, completion: nil)
+           
+            let subWindow = UIView(frame: CGRect(x: self.view!.bounds.midX - 128, y: self.view!.bounds.midY - 128, width: 256, height: 256))
+            subWindow.backgroundColor = UIColor.clear
+            let subLabel = UILabel(frame: CGRect(x: subWindow.bounds.midX - 64, y: subWindow.bounds.midY - 16, width: 128, height: 32))
+            subLabel.text = "Bonus"
+            subLabel.textAlignment = .center
+            subLabel.textColor = UIColor.white
+            subWindow.addSubview(subLabel)
+            self.view?.window?.rootViewController?.view.addSubview(subWindow)
+            
         case "spaceman":
             print("player \(box.position)")
         case "baiter":
@@ -1266,7 +1287,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
             player.movementComponent.applyImpulseUp(lastUpdateTimeInterval)
         case "down":
             player.movementComponent.applyImpulseDown(lastUpdateTimeInterval)
-            //fuck
         case "advance":
             let direct = playerNode.userData?.object(forKey: "direction") as? String
             if previousDirection == nil || previousDirection != direct {

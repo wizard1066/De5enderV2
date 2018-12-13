@@ -19,7 +19,7 @@ class MovementComponent: GKComponent {
     var localScene: SKScene?
     
     var playableStart: CGFloat = 0
-    var playableRegion: CGFloat = UIScreen.main.bounds.maxY * 2
+    var playableRegion: CGFloat = UIScreen.main.bounds.maxY * 2 * 0.80
     
   
 
