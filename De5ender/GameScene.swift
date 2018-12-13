@@ -627,7 +627,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
 
         let highscorePlacement = CGPoint(x: self.view!.bounds.maxX * 2 - 128, y: self.view!.bounds.maxY * 2 - 128)
         highScore = TextEntity(text: "0", Cords:highscorePlacement , name: "highscore")
+        highScore.textComponent.node.zPosition = Layer.mask.rawValue
         addChild(highScore.textComponent.node)
+        
         
         let nextWavePlacement = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY)
         nextWave = TextEntity(text: "", Cords: nextWavePlacement, name: "nextwave")
@@ -1050,19 +1052,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
                     } else {
                         lives = 3
                         print("GameOver \(points)")
-                        self.view?.isPaused = true
+                        
                         contact.bodyA.node?.removeFromParent()
                         other.node?.removeFromParent()
                         
                         let gameOver = SKLabelNode()
                         gameOver.text = "Game Over"
-                        gameOver.position = CGPoint(x: self.view!.bounds.midX, y: self.view!.bounds.midY)
+                        gameOver.fontSize = 128
+                        gameOver.fontName = "Futura-CondensedExtraBold"
+                        gameOver.position = CGPoint(x: self.view!.bounds.maxX - 20, y: self.view!.bounds.maxY + 180)
+                        
                         addChild(gameOver)
-                        let restart = TouchableSprite(imageNamed: "OrangeBulletExplo1")
+                        let restart = TouchableSprite(imageNamed: "mine")
                         restart.name = "restart"
-                        restart.position = CGPoint(x: self.view!.bounds.midX, y: self.view!.bounds.midY + 128)
+                        restart.position = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY - 128)
                         restart.delegate = self
                         addChild(restart)
+                        
+                        let newGame = SKLabelNode()
+                        newGame.text = "Restart"
+                        newGame.fontSize = 96
+                        newGame.fontName = "Futura-CondensedExtraBold"
+                        newGame.fontColor = UIColor.black
+                        newGame.position = CGPoint(x: self.view!.bounds.maxX, y: self.view!.bounds.maxY - 128)
+                        addChild(newGame)
+                        
+                        self.view?.isPaused = true
                     }
                 }
             }
@@ -1211,7 +1226,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, touchMe, landerEscaped {
         let skView = self.view as? SKView
         skView!.showsFPS = true
         skView!.showsNodeCount = true
-        skView!.showsPhysics = true
+        skView!.showsPhysics = false
         skView!.ignoresSiblingOrder = true
         scene.scaleMode = .aspectFit
         skView!.presentScene(scene)
